@@ -1,0 +1,2800 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Folio Books — Discover Your Next Favorite Book</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              bg: "#0f0f0f",
+              fg: "#faf8f5",
+              muted: "#8a8580",
+              accent: "#c4956a",
+              accentDark: "#a67b52",
+              card: "#1a1918",
+              cardHover: "#242322",
+              border: "#2a2928",
+              cream: "#f5f0e8",
+              warmGray: "#d4cfc7",
+            },
+            fontFamily: {
+              display: ["Cormorant Garamond", "serif"],
+              sans: ["DM Sans", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      :root {
+        --bg: #0f0f0f;
+        --fg: #faf8f5;
+        --muted: #8a8580;
+        --accent: #c4956a;
+        --accent-dark: #a67b52;
+        --card: #1a1918;
+        --border: #2a2928;
+      }
+
+      * {
+        scrollbar-width: thin;
+        scrollbar-color: var(--accent) var(--card);
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--fg);
+      }
+
+      .nav-link {
+        position: relative;
+      }
+
+      .nav-link::after {
+        content: "";
+        position: absolute;
+        bottom: -4px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: var(--accent);
+        transition: width 0.3s ease;
+      }
+
+      .nav-link:hover::after {
+        width: 100%;
+      }
+
+      .hero-bg {
+        background:
+          linear-gradient(
+            135deg,
+            rgba(15, 15, 15, 0.92) 0%,
+            rgba(15, 15, 15, 0.75) 50%,
+            rgba(15, 15, 15, 0.85) 100%
+          ),
+          url("https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=1920&q=80")
+            center/cover no-repeat;
+      }
+
+      .book-card {
+        transition:
+          transform 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+          box-shadow 0.4s ease;
+      }
+
+      .book-card:hover {
+        transform: translateY(-12px) scale(1.02);
+        box-shadow:
+          0 25px 50px -12px rgba(196, 149, 106, 0.15),
+          0 0 0 1px rgba(196, 149, 106, 0.1);
+      }
+
+      .book-cover {
+        transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+      }
+
+      .book-card:hover .book-cover {
+        transform: scale(1.05);
+      }
+
+      .genre-card {
+        transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+      }
+
+      .genre-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px -15px rgba(196, 149, 106, 0.2);
+      }
+
+      .carousel-container {
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .carousel-item {
+        scroll-snap-align: start;
+      }
+
+      .glow-accent {
+        box-shadow: 0 0 40px rgba(196, 149, 106, 0.3);
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(40px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideInLeft {
+        from {
+          opacity: 0;
+          transform: translateX(-30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .reveal {
+        opacity: 0;
+      }
+
+      .reveal.active {
+        animation: fadeInUp 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+      }
+
+      .reveal-left.active {
+        animation: slideInLeft 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+      }
+
+      .stagger-1 {
+        animation-delay: 0.1s;
+      }
+      .stagger-2 {
+        animation-delay: 0.2s;
+      }
+      .stagger-3 {
+        animation-delay: 0.3s;
+      }
+      .stagger-4 {
+        animation-delay: 0.4s;
+      }
+      .stagger-5 {
+        animation-delay: 0.5s;
+      }
+      .stagger-6 {
+        animation-delay: 0.6s;
+      }
+
+      .btn-primary {
+        background: linear-gradient(
+          135deg,
+          var(--accent) 0%,
+          var(--accent-dark) 100%
+        );
+        transition: all 0.3s ease;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px -10px rgba(196, 149, 106, 0.5);
+      }
+
+      .btn-secondary {
+        border: 1px solid var(--accent);
+        transition: all 0.3s ease;
+      }
+
+      .btn-secondary:hover {
+        background: rgba(196, 149, 106, 0.1);
+        transform: translateY(-2px);
+      }
+
+      .search-input:focus {
+        box-shadow: 0 0 0 2px var(--accent);
+      }
+
+      .noise-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        opacity: 0.03;
+        z-index: 100;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      }
+
+      .gradient-blob {
+        position: absolute;
+        width: 600px;
+        height: 600px;
+        border-radius: 50%;
+        filter: blur(120px);
+        opacity: 0.15;
+      }
+
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        background: transparent;
+        cursor: pointer;
+      }
+
+      input[type="range"]::-webkit-slider-track {
+        background: var(--border);
+        height: 4px;
+        border-radius: 2px;
+      }
+
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 18px;
+        height: 18px;
+        background: var(--accent);
+        border-radius: 50%;
+        margin-top: -7px;
+      }
+
+      .mobile-menu {
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+      }
+
+      .mobile-menu.open {
+        transform: translateX(0);
+      }
+    </style>
+  </head>
+  <body class="font-sans antialiased">
+    <div class="noise-overlay"></div>
+
+    <!-- Navbar -->
+    <nav
+      class="fixed top-0 left-0 right-0 z-50 bg-bg/95 backdrop-blur-md border-b border-border"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16 lg:h-20">
+          <!-- Logo -->
+          <a href="#" class="flex items-center gap-2">
+            <svg
+              class="w-8 h-8 text-accent"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"
+              />
+            </svg>
+            <span class="font-display text-2xl font-semibold tracking-tight"
+              >Folio</span
+            >
+          </a>
+
+          <!-- Desktop Navigation -->
+          <div class="hidden lg:flex items-center gap-8">
+            <a
+              href="#"
+              class="nav-link text-fg/90 hover:text-fg transition-colors"
+              >Home</a
+            >
+            <a
+              href="#genres"
+              class="nav-link text-fg/90 hover:text-fg transition-colors"
+              >Categories</a
+            >
+            <a
+              href="#bestsellers"
+              class="nav-link text-fg/90 hover:text-fg transition-colors"
+              >Best Sellers</a
+            >
+            <a
+              href="#new-arrivals"
+              class="nav-link text-fg/90 hover:text-fg transition-colors"
+              >New Arrivals</a
+            >
+            <a
+              href="#about"
+              class="nav-link text-fg/90 hover:text-fg transition-colors"
+              >About</a
+            >
+          </div>
+
+          <!-- Search Bar -->
+          <div class="hidden md:flex items-center flex-1 max-w-md mx-8">
+            <div class="relative w-full">
+              <input
+                type="text"
+                placeholder="Search books, authors..."
+                class="search-input w-full bg-card border border-border rounded-full py-2.5 pl-12 pr-4 text-sm text-fg placeholder:text-muted focus:outline-none focus:border-accent transition-all"
+              />
+              <svg
+                class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                />
+              </svg>
+            </div>
+          </div>
+
+          <!-- Icons -->
+          <div class="flex items-center gap-4">
+            <!-- Cart -->
+            <button
+              class="relative p-2 text-fg/80 hover:text-accent transition-colors"
+              aria-label="Shopping cart"
+            >
+              <svg
+                class="w-6 h-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="1.5"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
+                />
+              </svg>
+              <span
+                class="absolute -top-1 -right-1 w-5 h-5 bg-accent text-bg text-xs font-semibold rounded-full flex items-center justify-center"
+                >3</span
+              >
+            </button>
+
+            <!-- User -->
+            <button
+              class="p-2 text-fg/80 hover:text-accent transition-colors hidden sm:block"
+              aria-label="User account"
+            >
+              <svg
+                class="w-6 h-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="1.5"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+                />
+              </svg>
+            </button>
+
+            <!-- Mobile Menu Button -->
+            <button
+              id="mobile-menu-btn"
+              class="lg:hidden p-2 text-fg/80 hover:text-accent transition-colors"
+              aria-label="Open menu"
+            >
+              <svg
+                class="w-6 h-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="1.5"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Search -->
+      <div class="md:hidden px-4 pb-4">
+        <div class="relative">
+          <input
+            type="text"
+            placeholder="Search books, authors..."
+            class="search-input w-full bg-card border border-border rounded-full py-2.5 pl-12 pr-4 text-sm text-fg placeholder:text-muted focus:outline-none"
+          />
+          <svg
+            class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+            />
+          </svg>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div
+      id="mobile-menu"
+      class="mobile-menu fixed inset-y-0 right-0 w-72 bg-card border-l border-border z-50 lg:hidden"
+    >
+      <div class="p-6">
+        <button
+          id="close-menu"
+          class="absolute top-4 right-4 p-2 text-muted hover:text-fg transition-colors"
+          aria-label="Close menu"
+        >
+          <svg
+            class="w-6 h-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+        <nav class="mt-12 flex flex-col gap-6">
+          <a
+            href="#"
+            class="text-lg text-fg hover:text-accent transition-colors"
+            >Home</a
+          >
+          <a
+            href="#genres"
+            class="text-lg text-fg hover:text-accent transition-colors"
+            >Categories</a
+          >
+          <a
+            href="#bestsellers"
+            class="text-lg text-fg hover:text-accent transition-colors"
+            >Best Sellers</a
+          >
+          <a
+            href="#new-arrivals"
+            class="text-lg text-fg hover:text-accent transition-colors"
+            >New Arrivals</a
+          >
+          <a
+            href="#about"
+            class="text-lg text-fg hover:text-accent transition-colors"
+            >About</a
+          >
+        </nav>
+      </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero-bg relative min-h-screen flex items-center pt-20">
+      <div class="gradient-blob bg-accent top-20 -left-40"></div>
+      <div class="gradient-blob bg-amber-600 bottom-0 right-0"></div>
+
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32 relative z-10"
+      >
+        <div class="max-w-3xl">
+          <p
+            class="reveal stagger-1 text-accent font-medium tracking-widest uppercase text-sm mb-6"
+          >
+            Welcome to Folio Books
+          </p>
+          <h1
+            class="reveal stagger-2 font-display text-5xl sm:text-6xl lg:text-7xl font-semibold leading-tight mb-6"
+          >
+            Discover Your Next<br />
+            <span class="text-accent">Favorite Book</span>
+          </h1>
+          <p
+            class="reveal stagger-3 text-lg sm:text-xl text-warmGray/80 max-w-xl mb-10 leading-relaxed"
+          >
+            Curated collections spanning centuries of human imagination. From
+            timeless classics to contemporary masterpieces, find stories that
+            resonate with your soul.
+          </p>
+          <div class="reveal stagger-4 flex flex-wrap gap-4">
+            <a
+              href="#books"
+              class="btn-primary px-8 py-4 rounded-full text-bg font-semibold"
+            >
+              Browse Books
+            </a>
+            <a
+              href="#genres"
+              class="btn-secondary px-8 py-4 rounded-full text-accent font-semibold"
+            >
+              Explore Genres
+            </a>
+          </div>
+
+          <!-- Stats -->
+          <div
+            class="reveal stagger-5 flex gap-10 mt-16 pt-8 border-t border-border/50"
+          >
+            <div>
+              <p class="font-display text-4xl font-semibold text-fg">50K+</p>
+              <p class="text-muted text-sm mt-1">Books Available</p>
+            </div>
+            <div>
+              <p class="font-display text-4xl font-semibold text-fg">120+</p>
+              <p class="text-muted text-sm mt-1">Countries Served</p>
+            </div>
+            <div>
+              <p class="font-display text-4xl font-semibold text-fg">98%</p>
+              <p class="text-muted text-sm mt-1">Happy Readers</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scroll Indicator -->
+      <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+        <svg
+          class="w-6 h-6 text-muted"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M19 14l-7 7m0 0l-7-7m7 7V3"
+          />
+        </svg>
+      </div>
+    </section>
+
+    <!-- Genre Section -->
+    <section id="genres" class="py-20 lg:py-32 bg-bg relative">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+          <h2
+            class="reveal font-display text-4xl lg:text-5xl font-semibold mb-4"
+          >
+            Browse by Genre
+          </h2>
+          <p class="reveal text-muted text-lg">
+            Find the perfect story in your favorite category
+          </p>
+        </div>
+
+        <div
+          class="reveal grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6"
+        >
+          <!-- Genre Cards -->
+          <button
+            class="genre-card group bg-card border border-border rounded-2xl p-6 text-left hover:border-accent/50 transition-all focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg"
+          >
+            <div
+              class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-purple-600/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
+            >
+              <svg
+                class="w-6 h-6 text-purple-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="1.5"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"
+                />
+              </svg>
+            </div>
+            <h3 class="font-display text-xl font-semibold mb-1">Fantasy</h3>
+            <p class="text-muted text-sm">2,340 books</p>
+          </button>
+
+          <button
+            class="genre-card group bg-card border border-border rounded-2xl p-6 text-left hover:border-accent/50 transition-all focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg"
+          >
+            <div
+              class="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500/20 to-rose-600/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
+            >
+              <svg
+                class="w-6 h-6 text-rose-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="1.5"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
+                />
+              </svg>
+            </div>
+            <h3 class="font-display text-xl font-semibold mb-1">Romance</h3>
+            <p class="text-muted text-sm">3,120 books</p>
+          </button>
+
+          <button
+            class="genre-card group bg-card border border-border rounded-2xl p-6 text-left hover:border-accent/50 transition-all focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg"
+          >
+            <div
+              class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500/20 to-cyan-600/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
+            >
+              <svg
+                class="w-6 h-6 text-cyan-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="1.5"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z"
+                />
+              </svg>
+            </div>
+            <h3 class="font-display text-xl font-semibold mb-1">Sci-Fi</h3>
+            <p class="text-muted text-sm">1,890 books</p>
+          </button>
+
+          <button
+            class="genre-card group bg-card border border-border rounded-2xl p-6 text-left hover:border-accent/50 transition-all focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg"
+          >
+            <div
+              class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500/20 to-amber-600/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
+            >
+              <svg
+                class="w-6 h-6 text-amber-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="1.5"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18"
+                />
+              </svg>
+            </div>
+            <h3 class="font-display text-xl font-semibold mb-1">Mystery</h3>
+            <p class="text-muted text-sm">2,560 books</p>
+          </button>
+
+          <button
+            class="genre-card group bg-card border border-border rounded-2xl p-6 text-left hover:border-accent/50 transition-all focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg"
+          >
+            <div
+              class="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500/20 to-green-600/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
+            >
+              <svg
+                class="w-6 h-6 text-green-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="1.5"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5"
+                />
+              </svg>
+            </div>
+            <h3 class="font-display text-xl font-semibold mb-1">Self-Help</h3>
+            <p class="text-muted text-sm">1,450 books</p>
+          </button>
+
+          <button
+            class="genre-card group bg-card border border-border rounded-2xl p-6 text-left hover:border-accent/50 transition-all focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg"
+          >
+            <div
+              class="w-12 h-12 rounded-xl bg-gradient-to-br from-stone-500/20 to-stone-600/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
+            >
+              <svg
+                class="w-6 h-6 text-stone-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="1.5"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <h3 class="font-display text-xl font-semibold mb-1">History</h3>
+            <p class="text-muted text-sm">1,780 books</p>
+          </button>
+
+          <button
+            class="genre-card group bg-card border border-border rounded-2xl p-6 text-left hover:border-accent/50 transition-all focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg"
+          >
+            <div
+              class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-600/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
+            >
+              <svg
+                class="w-6 h-6 text-blue-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="1.5"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+                />
+              </svg>
+            </div>
+            <h3 class="font-display text-xl font-semibold mb-1">Biography</h3>
+            <p class="text-muted text-sm">980 books</p>
+          </button>
+
+          <button
+            class="genre-card group bg-card border border-border rounded-2xl p-6 text-left hover:border-accent/50 transition-all focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg"
+          >
+            <div
+              class="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500/20 to-red-600/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
+            >
+              <svg
+                class="w-6 h-6 text-red-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="1.5"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 18a3.75 3.75 0 00.495-7.467 5.99 5.99 0 00-1.925 3.546 5.974 5.974 0 01-2.133-1A3.75 3.75 0 0012 18z"
+                />
+              </svg>
+            </div>
+            <h3 class="font-display text-xl font-semibold mb-1">Horror</h3>
+            <p class="text-muted text-sm">760 books</p>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Books Section -->
+    <section
+      class="py-20 lg:py-32 bg-gradient-to-b from-bg via-card to-bg relative"
+    >
+      <div class="gradient-blob bg-accent/20 top-0 right-0"></div>
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div
+          class="flex flex-col lg:flex-row lg:items-end lg:justify-between mb-12"
+        >
+          <div>
+            <p
+              class="reveal text-accent font-medium tracking-widest uppercase text-sm mb-3"
+            >
+              Handpicked for You
+            </p>
+            <h2 class="reveal font-display text-4xl lg:text-5xl font-semibold">
+              Featured Books
+            </h2>
+          </div>
+          <a
+            href="#books"
+            class="reveal mt-4 lg:mt-0 text-accent hover:text-fg transition-colors flex items-center gap-2"
+          >
+            View all featured
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+              />
+            </svg>
+          </a>
+        </div>
+
+        <div
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
+        >
+          <!-- Featured Book 1 -->
+          <article
+            class="reveal book-card bg-card border border-border rounded-3xl overflow-hidden group"
+          >
+            <div class="relative overflow-hidden">
+              <div
+                class="book-cover aspect-[3/4] bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 flex items-center justify-center"
+              >
+                <div class="text-center p-8">
+                  <p class="text-purple-300 text-sm tracking-widest mb-2">
+                    A NOVEL
+                  </p>
+                  <h3
+                    class="font-display text-3xl text-white font-semibold leading-tight"
+                  >
+                    The Midnight<br />Library
+                  </h3>
+                  <p class="text-purple-200/60 mt-4 text-sm">Matt Haig</p>
+                </div>
+              </div>
+              <div
+                class="absolute top-4 right-4 bg-accent text-bg text-xs font-semibold px-3 py-1 rounded-full"
+              >
+                Staff Pick
+              </div>
+            </div>
+            <div class="p-6">
+              <div class="flex items-center gap-1 mb-3">
+                <span class="text-accent">★★★★★</span>
+                <span class="text-muted text-sm ml-2">4.9</span>
+              </div>
+              <h3 class="font-display text-xl font-semibold mb-1">
+                The Midnight Library
+              </h3>
+              <p class="text-muted mb-4">by Matt Haig</p>
+              <p class="text-warmGray/70 text-sm mb-4 line-clamp-2">
+                Between life and death there is a library. Nora's chance to live
+                different lives and undo all her regrets.
+              </p>
+              <div class="flex items-center justify-between">
+                <span class="font-display text-2xl font-semibold text-accent"
+                  >$24.99</span
+                >
+                <button
+                  class="btn-primary px-5 py-2.5 rounded-full text-bg text-sm font-semibold"
+                >
+                  Add to Cart
+                </button>
+              </div>
+            </div>
+          </article>
+
+          <!-- Featured Book 2 -->
+          <article
+            class="reveal book-card bg-card border border-border rounded-3xl overflow-hidden group"
+          >
+            <div class="relative overflow-hidden">
+              <div
+                class="book-cover aspect-[3/4] bg-gradient-to-br from-rose-900 via-pink-900 to-orange-900 flex items-center justify-center"
+              >
+                <div class="text-center p-8">
+                  <p class="text-rose-300 text-sm tracking-widest mb-2">
+                    FICTION
+                  </p>
+                  <h3
+                    class="font-display text-3xl text-white font-semibold leading-tight"
+                  >
+                    Tomorrow, and<br />Tomorrow
+                  </h3>
+                  <p class="text-rose-200/60 mt-4 text-sm">Gabrielle Zevin</p>
+                </div>
+              </div>
+            </div>
+            <div class="p-6">
+              <div class="flex items-center gap-1 mb-3">
+                <span class="text-accent">★★★★★</span>
+                <span class="text-muted text-sm ml-2">4.8</span>
+              </div>
+              <h3 class="font-display text-xl font-semibold mb-1">
+                Tomorrow, and Tomorrow
+              </h3>
+              <p class="text-muted mb-4">by Gabrielle Zevin</p>
+              <p class="text-warmGray/70 text-sm mb-4 line-clamp-2">
+                A story of friendship, love, and the creative process, spanning
+                thirty years in the lives of two game designers.
+              </p>
+              <div class="flex items-center justify-between">
+                <span class="font-display text-2xl font-semibold text-accent"
+                  >$28.99</span
+                >
+                <button
+                  class="btn-primary px-5 py-2.5 rounded-full text-bg text-sm font-semibold"
+                >
+                  Add to Cart
+                </button>
+              </div>
+            </div>
+          </article>
+
+          <!-- Featured Book 3 -->
+          <article
+            class="reveal book-card bg-card border border-border rounded-3xl overflow-hidden group"
+          >
+            <div class="relative overflow-hidden">
+              <div
+                class="book-cover aspect-[3/4] bg-gradient-to-br from-emerald-900 via-teal-900 to-cyan-900 flex items-center justify-center"
+              >
+                <div class="text-center p-8">
+                  <p class="text-emerald-300 text-sm tracking-widest mb-2">
+                    THRILLER
+                  </p>
+                  <h3
+                    class="font-display text-3xl text-white font-semibold leading-tight"
+                  >
+                    The Silent<br />Patient
+                  </h3>
+                  <p class="text-emerald-200/60 mt-4 text-sm">
+                    Alex Michaelides
+                  </p>
+                </div>
+              </div>
+              <div
+                class="absolute top-4 right-4 bg-rose-500 text-white text-xs font-semibold px-3 py-1 rounded-full"
+              >
+                Best Seller
+              </div>
+            </div>
+            <div class="p-6">
+              <div class="flex items-center gap-1 mb-3">
+                <span class="text-accent">★★★★☆</span>
+                <span class="text-muted text-sm ml-2">4.6</span>
+              </div>
+              <h3 class="font-display text-xl font-semibold mb-1">
+                The Silent Patient
+              </h3>
+              <p class="text-muted mb-4">by Alex Michaelides</p>
+              <p class="text-warmGray/70 text-sm mb-4 line-clamp-2">
+                Alicia's husband has been shot five times in the face. She never
+                speaks another word. The mystery unfolds.
+              </p>
+              <div class="flex items-center justify-between">
+                <span class="font-display text-2xl font-semibold text-accent"
+                  >$19.99</span
+                >
+                <button
+                  class="btn-primary px-5 py-2.5 rounded-full text-bg text-sm font-semibold"
+                >
+                  Add to Cart
+                </button>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- All Books with Sidebar -->
+    <section id="books" class="py-20 lg:py-32 bg-bg">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col lg:flex-row gap-8">
+          <!-- Sidebar Filters -->
+          <aside class="reveal-left lg:w-64 flex-shrink-0">
+            <div
+              class="bg-card border border-border rounded-2xl p-6 sticky top-24"
+            >
+              <h3 class="font-display text-xl font-semibold mb-6">Filters</h3>
+
+              <!-- Categories -->
+              <div class="mb-6">
+                <h4 class="font-semibold text-sm mb-3 text-fg/80">
+                  Categories
+                </h4>
+                <div class="space-y-2">
+                  <label class="flex items-center gap-3 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      class="w-4 h-4 rounded border-border bg-bg accent-accent"
+                    />
+                    <span
+                      class="text-muted group-hover:text-fg transition-colors text-sm"
+                      >Fiction</span
+                    >
+                  </label>
+                  <label class="flex items-center gap-3 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      class="w-4 h-4 rounded border-border bg-bg accent-accent"
+                    />
+                    <span
+                      class="text-muted group-hover:text-fg transition-colors text-sm"
+                      >Non-Fiction</span
+                    >
+                  </label>
+                  <label class="flex items-center gap-3 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      class="w-4 h-4 rounded border-border bg-bg accent-accent"
+                    />
+                    <span
+                      class="text-muted group-hover:text-fg transition-colors text-sm"
+                      >Mystery</span
+                    >
+                  </label>
+                  <label class="flex items-center gap-3 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      class="w-4 h-4 rounded border-border bg-bg accent-accent"
+                    />
+                    <span
+                      class="text-muted group-hover:text-fg transition-colors text-sm"
+                      >Romance</span
+                    >
+                  </label>
+                  <label class="flex items-center gap-3 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      class="w-4 h-4 rounded border-border bg-bg accent-accent"
+                    />
+                    <span
+                      class="text-muted group-hover:text-fg transition-colors text-sm"
+                      >Sci-Fi</span
+                    >
+                  </label>
+                </div>
+              </div>
+
+              <!-- Price Range -->
+              <div class="mb-6">
+                <h4 class="font-semibold text-sm mb-3 text-fg/80">
+                  Price Range
+                </h4>
+                <div class="space-y-3">
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value="50"
+                    class="w-full"
+                  />
+                  <div class="flex justify-between text-sm text-muted">
+                    <span>$0</span>
+                    <span>$100+</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Rating -->
+              <div class="mb-6">
+                <h4 class="font-semibold text-sm mb-3 text-fg/80">Rating</h4>
+                <div class="space-y-2">
+                  <label class="flex items-center gap-3 cursor-pointer group">
+                    <input
+                      type="radio"
+                      name="rating"
+                      class="w-4 h-4 border-border bg-bg accent-accent"
+                    />
+                    <span
+                      class="text-muted group-hover:text-fg transition-colors text-sm flex items-center gap-1"
+                    >
+                      <span class="text-accent">★★★★★</span> & up
+                    </span>
+                  </label>
+                  <label class="flex items-center gap-3 cursor-pointer group">
+                    <input
+                      type="radio"
+                      name="rating"
+                      class="w-4 h-4 border-border bg-bg accent-accent"
+                    />
+                    <span
+                      class="text-muted group-hover:text-fg transition-colors text-sm flex items-center gap-1"
+                    >
+                      <span class="text-accent">★★★★</span
+                      ><span class="text-muted">☆</span> & up
+                    </span>
+                  </label>
+                  <label class="flex items-center gap-3 cursor-pointer group">
+                    <input
+                      type="radio"
+                      name="rating"
+                      class="w-4 h-4 border-border bg-bg accent-accent"
+                    />
+                    <span
+                      class="text-muted group-hover:text-fg transition-colors text-sm flex items-center gap-1"
+                    >
+                      <span class="text-accent">★★★</span
+                      ><span class="text-muted">☆☆</span> & up
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Language -->
+              <div>
+                <h4 class="font-semibold text-sm mb-3 text-fg/80">Language</h4>
+                <div class="space-y-2">
+                  <label class="flex items-center gap-3 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      checked
+                      class="w-4 h-4 rounded border-border bg-bg accent-accent"
+                    />
+                    <span
+                      class="text-muted group-hover:text-fg transition-colors text-sm"
+                      >English</span
+                    >
+                  </label>
+                  <label class="flex items-center gap-3 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      class="w-4 h-4 rounded border-border bg-bg accent-accent"
+                    />
+                    <span
+                      class="text-muted group-hover:text-fg transition-colors text-sm"
+                      >Spanish</span
+                    >
+                  </label>
+                  <label class="flex items-center gap-3 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      class="w-4 h-4 rounded border-border bg-bg accent-accent"
+                    />
+                    <span
+                      class="text-muted group-hover:text-fg transition-colors text-sm"
+                      >French</span
+                    >
+                  </label>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          <!-- Books Grid -->
+          <div class="flex-1">
+            <div class="flex items-center justify-between mb-8">
+              <p class="text-muted">
+                Showing <span class="text-fg font-semibold">16</span> books
+              </p>
+              <select
+                class="bg-card border border-border rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-accent"
+              >
+                <option>Sort by: Featured</option>
+                <option>Price: Low to High</option>
+                <option>Price: High to Low</option>
+                <option>Newest First</option>
+                <option>Rating</option>
+              </select>
+            </div>
+
+            <div
+              class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+            >
+              <!-- Book Cards -->
+              <article
+                class="reveal book-card bg-card border border-border rounded-2xl overflow-hidden group"
+              >
+                <div class="relative overflow-hidden">
+                  <div
+                    class="book-cover aspect-[3/4] bg-gradient-to-br from-violet-900 to-fuchsia-900 flex items-center justify-center"
+                  >
+                    <div class="text-center p-4">
+                      <h4 class="font-display text-xl text-white font-semibold">
+                        Project Hail Mary
+                      </h4>
+                      <p class="text-violet-200/60 mt-2 text-xs">Andy Weir</p>
+                    </div>
+                  </div>
+                  <span
+                    class="absolute top-2 left-2 bg-violet-500/80 text-white text-xs px-2 py-1 rounded-full"
+                    >Sci-Fi</span
+                  >
+                </div>
+                <div class="p-4">
+                  <h4 class="font-semibold mb-1 truncate">Project Hail Mary</h4>
+                  <p class="text-muted text-sm mb-2">Andy Weir</p>
+                  <p class="text-warmGray/60 text-xs mb-3 line-clamp-2">
+                    A lone astronaut must save Earth from disaster in this
+                    interstellar adventure.
+                  </p>
+                  <div class="flex items-center justify-between">
+                    <span class="font-display text-lg font-semibold text-accent"
+                      >$22.99</span
+                    >
+                    <button
+                      class="text-sm text-accent hover:text-fg transition-colors"
+                    >
+                      View Details
+                    </button>
+                  </div>
+                </div>
+              </article>
+
+              <article
+                class="reveal book-card bg-card border border-border rounded-2xl overflow-hidden group"
+              >
+                <div class="relative overflow-hidden">
+                  <div
+                    class="book-cover aspect-[3/4] bg-gradient-to-br from-amber-800 to-orange-900 flex items-center justify-center"
+                  >
+                    <div class="text-center p-4">
+                      <h4 class="font-display text-xl text-white font-semibold">
+                        Atomic Habits
+                      </h4>
+                      <p class="text-amber-200/60 mt-2 text-xs">James Clear</p>
+                    </div>
+                  </div>
+                  <span
+                    class="absolute top-2 left-2 bg-amber-500/80 text-white text-xs px-2 py-1 rounded-full"
+                    >Self-Help</span
+                  >
+                </div>
+                <div class="p-4">
+                  <h4 class="font-semibold mb-1 truncate">Atomic Habits</h4>
+                  <p class="text-muted text-sm mb-2">James Clear</p>
+                  <p class="text-warmGray/60 text-xs mb-3 line-clamp-2">
+                    Tiny changes, remarkable results. Build good habits, break
+                    bad ones.
+                  </p>
+                  <div class="flex items-center justify-between">
+                    <span class="font-display text-lg font-semibold text-accent"
+                      >$18.99</span
+                    >
+                    <button
+                      class="text-sm text-accent hover:text-fg transition-colors"
+                    >
+                      View Details
+                    </button>
+                  </div>
+                </div>
+              </article>
+
+              <article
+                class="reveal book-card bg-card border border-border rounded-2xl overflow-hidden group"
+              >
+                <div class="relative overflow-hidden">
+                  <div
+                    class="book-cover aspect-[3/4] bg-gradient-to-br from-slate-800 to-zinc-900 flex items-center justify-center"
+                  >
+                    <div class="text-center p-4">
+                      <h4 class="font-display text-xl text-white font-semibold">
+                        The Song of Achilles
+                      </h4>
+                      <p class="text-slate-200/60 mt-2 text-xs">
+                        Madeline Miller
+                      </p>
+                    </div>
+                  </div>
+                  <span
+                    class="absolute top-2 left-2 bg-rose-500/80 text-white text-xs px-2 py-1 rounded-full"
+                    >Romance</span
+                  >
+                </div>
+                <div class="p-4">
+                  <h4 class="font-semibold mb-1 truncate">
+                    The Song of Achilles
+                  </h4>
+                  <p class="text-muted text-sm mb-2">Madeline Miller</p>
+                  <p class="text-warmGray/60 text-xs mb-3 line-clamp-2">
+                    A tale of gods, kings, and the epic love between Achilles
+                    and Patroclus.
+                  </p>
+                  <div class="flex items-center justify-between">
+                    <span class="font-display text-lg font-semibold text-accent"
+                      >$16.99</span
+                    >
+                    <button
+                      class="text-sm text-accent hover:text-fg transition-colors"
+                    >
+                      View Details
+                    </button>
+                  </div>
+                </div>
+              </article>
+
+              <article
+                class="reveal book-card bg-card border border-border rounded-2xl overflow-hidden group"
+              >
+                <div class="relative overflow-hidden">
+                  <div
+                    class="book-cover aspect-[3/4] bg-gradient-to-br from-teal-800 to-cyan-900 flex items-center justify-center"
+                  >
+                    <div class="text-center p-4">
+                      <h4 class="font-display text-xl text-white font-semibold">
+                        Educated
+                      </h4>
+                      <p class="text-teal-200/60 mt-2 text-xs">Tara Westover</p>
+                    </div>
+                  </div>
+                  <span
+                    class="absolute top-2 left-2 bg-teal-500/80 text-white text-xs px-2 py-1 rounded-full"
+                    >Biography</span
+                  >
+                </div>
+                <div class="p-4">
+                  <h4 class="font-semibold mb-1 truncate">Educated</h4>
+                  <p class="text-muted text-sm mb-2">Tara Westover</p>
+                  <p class="text-warmGray/60 text-xs mb-3 line-clamp-2">
+                    A memoir about the transformative power of education and
+                    self-discovery.
+                  </p>
+                  <div class="flex items-center justify-between">
+                    <span class="font-display text-lg font-semibold text-accent"
+                      >$19.99</span
+                    >
+                    <button
+                      class="text-sm text-accent hover:text-fg transition-colors"
+                    >
+                      View Details
+                    </button>
+                  </div>
+                </div>
+              </article>
+
+              <article
+                class="reveal book-card bg-card border border-border rounded-2xl overflow-hidden group"
+              >
+                <div class="relative overflow-hidden">
+                  <div
+                    class="book-cover aspect-[3/4] bg-gradient-to-br from-red-900 to-rose-900 flex items-center justify-center"
+                  >
+                    <div class="text-center p-4">
+                      <h4 class="font-display text-xl text-white font-semibold">
+                        The Shining
+                      </h4>
+                      <p class="text-red-200/60 mt-2 text-xs">Stephen King</p>
+                    </div>
+                  </div>
+                  <span
+                    class="absolute top-2 left-2 bg-red-500/80 text-white text-xs px-2 py-1 rounded-full"
+                    >Horror</span
+                  >
+                </div>
+                <div class="p-4">
+                  <h4 class="font-semibold mb-1 truncate">The Shining</h4>
+                  <p class="text-muted text-sm mb-2">Stephen King</p>
+                  <p class="text-warmGray/60 text-xs mb-3 line-clamp-2">
+                    A family's descent into madness at the isolated Overlook
+                    Hotel.
+                  </p>
+                  <div class="flex items-center justify-between">
+                    <span class="font-display text-lg font-semibold text-accent"
+                      >$15.99</span
+                    >
+                    <button
+                      class="text-sm text-accent hover:text-fg transition-colors"
+                    >
+                      View Details
+                    </button>
+                  </div>
+                </div>
+              </article>
+
+              <article
+                class="reveal book-card bg-card border border-border rounded-2xl overflow-hidden group"
+              >
+                <div class="relative overflow-hidden">
+                  <div
+                    class="book-cover aspect-[3/4] bg-gradient-to-br from-blue-900 to-indigo-900 flex items-center justify-center"
+                  >
+                    <div class="text-center p-4">
+                      <h4 class="font-display text-xl text-white font-semibold">
+                        1984
+                      </h4>
+                      <p class="text-blue-200/60 mt-2 text-xs">George Orwell</p>
+                    </div>
+                  </div>
+                  <span
+                    class="absolute top-2 left-2 bg-blue-500/80 text-white text-xs px-2 py-1 rounded-full"
+                    >Classic</span
+                  >
+                </div>
+                <div class="p-4">
+                  <h4 class="font-semibold mb-1 truncate">1984</h4>
+                  <p class="text-muted text-sm mb-2">George Orwell</p>
+                  <p class="text-warmGray/60 text-xs mb-3 line-clamp-2">
+                    A dystopian masterpiece about totalitarian control and
+                    surveillance.
+                  </p>
+                  <div class="flex items-center justify-between">
+                    <span class="font-display text-lg font-semibold text-accent"
+                      >$12.99</span
+                    >
+                    <button
+                      class="text-sm text-accent hover:text-fg transition-colors"
+                    >
+                      View Details
+                    </button>
+                  </div>
+                </div>
+              </article>
+
+              <article
+                class="reveal book-card bg-card border border-border rounded-2xl overflow-hidden group"
+              >
+                <div class="relative overflow-hidden">
+                  <div
+                    class="book-cover aspect-[3/4] bg-gradient-to-br from-pink-800 to-purple-900 flex items-center justify-center"
+                  >
+                    <div class="text-center p-4">
+                      <h4 class="font-display text-xl text-white font-semibold">
+                        Circe
+                      </h4>
+                      <p class="text-pink-200/60 mt-2 text-xs">
+                        Madeline Miller
+                      </p>
+                    </div>
+                  </div>
+                  <span
+                    class="absolute top-2 left-2 bg-purple-500/80 text-white text-xs px-2 py-1 rounded-full"
+                    >Fantasy</span
+                  >
+                </div>
+                <div class="p-4">
+                  <h4 class="font-semibold mb-1 truncate">Circe</h4>
+                  <p class="text-muted text-sm mb-2">Madeline Miller</p>
+                  <p class="text-warmGray/60 text-xs mb-3 line-clamp-2">
+                    The witch of Greek mythology tells her own story of gods and
+                    mortals.
+                  </p>
+                  <div class="flex items-center justify-between">
+                    <span class="font-display text-lg font-semibold text-accent"
+                      >$17.99</span
+                    >
+                    <button
+                      class="text-sm text-accent hover:text-fg transition-colors"
+                    >
+                      View Details
+                    </button>
+                  </div>
+                </div>
+              </article>
+
+              <article
+                class="reveal book-card bg-card border border-border rounded-2xl overflow-hidden group"
+              >
+                <div class="relative overflow-hidden">
+                  <div
+                    class="book-cover aspect-[3/4] bg-gradient-to-br from-stone-700 to-neutral-900 flex items-center justify-center"
+                  >
+                    <div class="text-center p-4">
+                      <h4 class="font-display text-xl text-white font-semibold">
+                        Sapiens
+                      </h4>
+                      <p class="text-stone-200/60 mt-2 text-xs">
+                        Yuval Noah Harari
+                      </p>
+                    </div>
+                  </div>
+                  <span
+                    class="absolute top-2 left-2 bg-stone-500/80 text-white text-xs px-2 py-1 rounded-full"
+                    >History</span
+                  >
+                </div>
+                <div class="p-4">
+                  <h4 class="font-semibold mb-1 truncate">Sapiens</h4>
+                  <p class="text-muted text-sm mb-2">Yuval Noah Harari</p>
+                  <p class="text-warmGray/60 text-xs mb-3 line-clamp-2">
+                    A brief history of humankind, from ancient times to the
+                    present day.
+                  </p>
+                  <div class="flex items-center justify-between">
+                    <span class="font-display text-lg font-semibold text-accent"
+                      >$21.99</span
+                    >
+                    <button
+                      class="text-sm text-accent hover:text-fg transition-colors"
+                    >
+                      View Details
+                    </button>
+                  </div>
+                </div>
+              </article>
+
+              <article
+                class="reveal book-card bg-card border border-border rounded-2xl overflow-hidden group"
+              >
+                <div class="relative overflow-hidden">
+                  <div
+                    class="book-cover aspect-[3/4] bg-gradient-to-br from-emerald-800 to-green-900 flex items-center justify-center"
+                  >
+                    <div class="text-center p-4">
+                      <h4 class="font-display text-xl text-white font-semibold">
+                        The Alchemist
+                      </h4>
+                      <p class="text-emerald-200/60 mt-2 text-xs">
+                        Paulo Coelho
+                      </p>
+                    </div>
+                  </div>
+                  <span
+                    class="absolute top-2 left-2 bg-emerald-500/80 text-white text-xs px-2 py-1 rounded-full"
+                    >Fiction</span
+                  >
+                </div>
+                <div class="p-4">
+                  <h4 class="font-semibold mb-1 truncate">The Alchemist</h4>
+                  <p class="text-muted text-sm mb-2">Paulo Coelho</p>
+                  <p class="text-warmGray/60 text-xs mb-3 line-clamp-2">
+                    A shepherd's journey to find treasure and discover his
+                    personal legend.
+                  </p>
+                  <div class="flex items-center justify-between">
+                    <span class="font-display text-lg font-semibold text-accent"
+                      >$14.99</span
+                    >
+                    <button
+                      class="text-sm text-accent hover:text-fg transition-colors"
+                    >
+                      View Details
+                    </button>
+                  </div>
+                </div>
+              </article>
+
+              <article
+                class="reveal book-card bg-card border border-border rounded-2xl overflow-hidden group"
+              >
+                <div class="relative overflow-hidden">
+                  <div
+                    class="book-cover aspect-[3/4] bg-gradient-to-br from-yellow-800 to-amber-900 flex items-center justify-center"
+                  >
+                    <div class="text-center p-4">
+                      <h4 class="font-display text-xl text-white font-semibold">
+                        Dune
+                      </h4>
+                      <p class="text-yellow-200/60 mt-2 text-xs">
+                        Frank Herbert
+                      </p>
+                    </div>
+                  </div>
+                  <span
+                    class="absolute top-2 left-2 bg-yellow-600/80 text-white text-xs px-2 py-1 rounded-full"
+                    >Sci-Fi</span
+                  >
+                </div>
+                <div class="p-4">
+                  <h4 class="font-semibold mb-1 truncate">Dune</h4>
+                  <p class="text-muted text-sm mb-2">Frank Herbert</p>
+                  <p class="text-warmGray/60 text-xs mb-3 line-clamp-2">
+                    Epic science fiction saga of politics, religion, and
+                    survival on Arrakis.
+                  </p>
+                  <div class="flex items-center justify-between">
+                    <span class="font-display text-lg font-semibold text-accent"
+                      >$18.99</span
+                    >
+                    <button
+                      class="text-sm text-accent hover:text-fg transition-colors"
+                    >
+                      View Details
+                    </button>
+                  </div>
+                </div>
+              </article>
+
+              <article
+                class="reveal book-card bg-card border border-border rounded-2xl overflow-hidden group"
+              >
+                <div class="relative overflow-hidden">
+                  <div
+                    class="book-cover aspect-[3/4] bg-gradient-to-br from-gray-800 to-slate-900 flex items-center justify-center"
+                  >
+                    <div class="text-center p-4">
+                      <h4 class="font-display text-xl text-white font-semibold">
+                        Gone Girl
+                      </h4>
+                      <p class="text-gray-200/60 mt-2 text-xs">Gillian Flynn</p>
+                    </div>
+                  </div>
+                  <span
+                    class="absolute top-2 left-2 bg-gray-500/80 text-white text-xs px-2 py-1 rounded-full"
+                    >Mystery</span
+                  >
+                </div>
+                <div class="p-4">
+                  <h4 class="font-semibold mb-1 truncate">Gone Girl</h4>
+                  <p class="text-muted text-sm mb-2">Gillian Flynn</p>
+                  <p class="text-warmGray/60 text-xs mb-3 line-clamp-2">
+                    A marriage unraveling, a wife missing, and dark secrets
+                    revealed.
+                  </p>
+                  <div class="flex items-center justify-between">
+                    <span class="font-display text-lg font-semibold text-accent"
+                      >$16.99</span
+                    >
+                    <button
+                      class="text-sm text-accent hover:text-fg transition-colors"
+                    >
+                      View Details
+                    </button>
+                  </div>
+                </div>
+              </article>
+
+              <article
+                class="reveal book-card bg-card border border-border rounded-2xl overflow-hidden group"
+              >
+                <div class="relative overflow-hidden">
+                  <div
+                    class="book-cover aspect-[3/4] bg-gradient-to-br from-cyan-800 to-blue-900 flex items-center justify-center"
+                  >
+                    <div class="text-center p-4">
+                      <h4 class="font-display text-xl text-white font-semibold">
+                        The Great Gatsby
+                      </h4>
+                      <p class="text-cyan-200/60 mt-2 text-xs">
+                        F. Scott Fitzgerald
+                      </p>
+                    </div>
+                  </div>
+                  <span
+                    class="absolute top-2 left-2 bg-cyan-500/80 text-white text-xs px-2 py-1 rounded-full"
+                    >Classic</span
+                  >
+                </div>
+                <div class="p-4">
+                  <h4 class="font-semibold mb-1 truncate">The Great Gatsby</h4>
+                  <p class="text-muted text-sm mb-2">F. Scott Fitzgerald</p>
+                  <p class="text-warmGray/60 text-xs mb-3 line-clamp-2">
+                    Jazz Age decadence, obsession, and the American Dream.
+                  </p>
+                  <div class="flex items-center justify-between">
+                    <span class="font-display text-lg font-semibold text-accent"
+                      >$11.99</span
+                    >
+                    <button
+                      class="text-sm text-accent hover:text-fg transition-colors"
+                    >
+                      View Details
+                    </button>
+                  </div>
+                </div>
+              </article>
+
+              <article
+                class="reveal book-card bg-card border border-border rounded-2xl overflow-hidden group"
+              >
+                <div class="relative overflow-hidden">
+                  <div
+                    class="book-cover aspect-[3/4] bg-gradient-to-br from-rose-700 to-pink-900 flex items-center justify-center"
+                  >
+                    <div class="text-center p-4">
+                      <h4 class="font-display text-xl text-white font-semibold">
+                        Pride and Prejudice
+                      </h4>
+                      <p class="text-rose-200/60 mt-2 text-xs">Jane Austen</p>
+                    </div>
+                  </div>
+                  <span
+                    class="absolute top-2 left-2 bg-rose-500/80 text-white text-xs px-2 py-1 rounded-full"
+                    >Romance</span
+                  >
+                </div>
+                <div class="p-4">
+                  <h4 class="font-semibold mb-1 truncate">
+                    Pride and Prejudice
+                  </h4>
+                  <p class="text-muted text-sm mb-2">Jane Austen</p>
+                  <p class="text-warmGray/60 text-xs mb-3 line-clamp-2">
+                    Elizabeth Bennet and Mr. Darcy's timeless story of love and
+                    growth.
+                  </p>
+                  <div class="flex items-center justify-between">
+                    <span class="font-display text-lg font-semibold text-accent"
+                      >$9.99</span
+                    >
+                    <button
+                      class="text-sm text-accent hover:text-fg transition-colors"
+                    >
+                      View Details
+                    </button>
+                  </div>
+                </div>
+              </article>
+
+              <article
+                class="reveal book-card bg-card border border-border rounded-2xl overflow-hidden group"
+              >
+                <div class="relative overflow-hidden">
+                  <div
+                    class="book-cover aspect-[3/4] bg-gradient-to-br from-orange-800 to-red-900 flex items-center justify-center"
+                  >
+                    <div class="text-center p-4">
+                      <h4 class="font-display text-xl text-white font-semibold">
+                        The Kite Runner
+                      </h4>
+                      <p class="text-orange-200/60 mt-2 text-xs">
+                        Khaled Hosseini
+                      </p>
+                    </div>
+                  </div>
+                  <span
+                    class="absolute top-2 left-2 bg-orange-500/80 text-white text-xs px-2 py-1 rounded-full"
+                    >Fiction</span
+                  >
+                </div>
+                <div class="p-4">
+                  <h4 class="font-semibold mb-1 truncate">The Kite Runner</h4>
+                  <p class="text-muted text-sm mb-2">Khaled Hosseini</p>
+                  <p class="text-warmGray/60 text-xs mb-3 line-clamp-2">
+                    Friendship, betrayal, and redemption set against
+                    Afghanistan's turmoil.
+                  </p>
+                  <div class="flex items-center justify-between">
+                    <span class="font-display text-lg font-semibold text-accent"
+                      >$15.99</span
+                    >
+                    <button
+                      class="text-sm text-accent hover:text-fg transition-colors"
+                    >
+                      View Details
+                    </button>
+                  </div>
+                </div>
+              </article>
+
+              <article
+                class="reveal book-card bg-card border border-border rounded-2xl overflow-hidden group"
+              >
+                <div class="relative overflow-hidden">
+                  <div
+                    class="book-cover aspect-[3/4] bg-gradient-to-br from-indigo-800 to-violet-900 flex items-center justify-center"
+                  >
+                    <div class="text-center p-4">
+                      <h4 class="font-display text-xl text-white font-semibold">
+                        Where the Crawdads Sing
+                      </h4>
+                      <p class="text-indigo-200/60 mt-2 text-xs">Delia Owens</p>
+                    </div>
+                  </div>
+                  <span
+                    class="absolute top-2 left-2 bg-indigo-500/80 text-white text-xs px-2 py-1 rounded-full"
+                    >Mystery</span
+                  >
+                </div>
+                <div class="p-4">
+                  <h4 class="font-semibold mb-1 truncate">
+                    Where the Crawdads Sing
+                  </h4>
+                  <p class="text-muted text-sm mb-2">Delia Owens</p>
+                  <p class="text-warmGray/60 text-xs mb-3 line-clamp-2">
+                    A murder mystery intertwined with nature and isolation.
+                  </p>
+                  <div class="flex items-center justify-between">
+                    <span class="font-display text-lg font-semibold text-accent"
+                      >$17.99</span
+                    >
+                    <button
+                      class="text-sm text-accent hover:text-fg transition-colors"
+                    >
+                      View Details
+                    </button>
+                  </div>
+                </div>
+              </article>
+
+              <article
+                class="reveal book-card bg-card border border-border rounded-2xl overflow-hidden group"
+              >
+                <div class="relative overflow-hidden">
+                  <div
+                    class="book-cover aspect-[3/4] bg-gradient-to-br from-lime-800 to-green-900 flex items-center justify-center"
+                  >
+                    <div class="text-center p-4">
+                      <h4 class="font-display text-xl text-white font-semibold">
+                        The House in the Cerulean Sea
+                      </h4>
+                      <p class="text-lime-200/60 mt-2 text-xs">TJ Klune</p>
+                    </div>
+                  </div>
+                  <span
+                    class="absolute top-2 left-2 bg-lime-500/80 text-white text-xs px-2 py-1 rounded-full"
+                    >Fantasy</span
+                  >
+                </div>
+                <div class="p-4">
+                  <h4 class="font-semibold mb-1 truncate">
+                    The House in the Cerulean Sea
+                  </h4>
+                  <p class="text-muted text-sm mb-2">TJ Klune</p>
+                  <p class="text-warmGray/60 text-xs mb-3 line-clamp-2">
+                    A magical orphanage, found family, and learning to belong.
+                  </p>
+                  <div class="flex items-center justify-between">
+                    <span class="font-display text-lg font-semibold text-accent"
+                      >$19.99</span
+                    >
+                    <button
+                      class="text-sm text-accent hover:text-fg transition-colors"
+                    >
+                      View Details
+                    </button>
+                  </div>
+                </div>
+              </article>
+            </div>
+
+            <!-- Pagination -->
+            <div class="flex justify-center items-center gap-2 mt-12">
+              <button
+                class="w-10 h-10 rounded-lg border border-border hover:border-accent transition-colors flex items-center justify-center"
+                aria-label="Previous page"
+              >
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M15.75 19.5L8.25 12l7.5-7.5"
+                  />
+                </svg>
+              </button>
+              <button
+                class="w-10 h-10 rounded-lg bg-accent text-bg font-semibold"
+              >
+                1
+              </button>
+              <button
+                class="w-10 h-10 rounded-lg border border-border hover:border-accent transition-colors"
+              >
+                2
+              </button>
+              <button
+                class="w-10 h-10 rounded-lg border border-border hover:border-accent transition-colors"
+              >
+                3
+              </button>
+              <span class="px-2 text-muted">...</span>
+              <button
+                class="w-10 h-10 rounded-lg border border-border hover:border-accent transition-colors"
+              >
+                12
+              </button>
+              <button
+                class="w-10 h-10 rounded-lg border border-border hover:border-accent transition-colors flex items-center justify-center"
+                aria-label="Next page"
+              >
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M8.25 4.5l7.5 7.5-7.5 7.5"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Best Sellers Carousel -->
+    <section
+      id="bestsellers"
+      class="py-20 lg:py-32 bg-card relative overflow-hidden"
+    >
+      <div class="gradient-blob bg-rose-600/20 top-0 left-1/4"></div>
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="flex items-center justify-between mb-10">
+          <div>
+            <p
+              class="reveal text-accent font-medium tracking-widest uppercase text-sm mb-3"
+            >
+              Trending Now
+            </p>
+            <h2 class="reveal font-display text-4xl lg:text-5xl font-semibold">
+              Best Sellers
+            </h2>
+          </div>
+          <div class="hidden sm:flex gap-2">
+            <button
+              id="prev-bestseller"
+              class="w-12 h-12 rounded-full border border-border hover:border-accent transition-colors flex items-center justify-center"
+              aria-label="Previous"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M15.75 19.5L8.25 12l7.5-7.5"
+                />
+              </svg>
+            </button>
+            <button
+              id="next-bestseller"
+              class="w-12 h-12 rounded-full border border-border hover:border-accent transition-colors flex items-center justify-center"
+              aria-label="Next"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M8.25 4.5l7.5 7.5-7.5 7.5"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div
+          id="bestsellers-carousel"
+          class="carousel-container flex gap-6 overflow-x-auto pb-4 -mx-4 px-4 snap-x snap-mandatory"
+        >
+          <!-- Best Seller Cards -->
+          <article
+            class="carousel-item flex-shrink-0 w-64 bg-bg border border-border rounded-2xl overflow-hidden group"
+          >
+            <div class="relative">
+              <div
+                class="aspect-[3/4] bg-gradient-to-br from-red-900 to-orange-900 flex items-center justify-center"
+              >
+                <div class="text-center p-4">
+                  <h4 class="font-display text-lg text-white font-semibold">
+                    Fourth Wing
+                  </h4>
+                  <p class="text-red-200/60 mt-2 text-xs">Rebecca Yarros</p>
+                </div>
+              </div>
+              <span
+                class="absolute top-2 left-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1"
+              >
+                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                Best Seller
+              </span>
+            </div>
+            <div class="p-4">
+              <div class="flex items-center gap-1 mb-2">
+                <span class="text-accent text-sm">★★★★★</span>
+                <span class="text-muted text-xs">4.9</span>
+              </div>
+              <h4 class="font-semibold truncate">Fourth Wing</h4>
+              <p class="text-muted text-sm">Rebecca Yarros</p>
+              <div class="flex items-center justify-between mt-3">
+                <span class="font-display text-lg font-semibold text-accent"
+                  >$26.99</span
+                >
+                <button
+                  class="btn-primary px-3 py-1.5 rounded-full text-bg text-xs font-semibold"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+          </article>
+
+          <article
+            class="carousel-item flex-shrink-0 w-64 bg-bg border border-border rounded-2xl overflow-hidden group"
+          >
+            <div class="relative">
+              <div
+                class="aspect-[3/4] bg-gradient-to-br from-blue-900 to-indigo-900 flex items-center justify-center"
+              >
+                <div class="text-center p-4">
+                  <h4 class="font-display text-lg text-white font-semibold">
+                    Iron Flame
+                  </h4>
+                  <p class="text-blue-200/60 mt-2 text-xs">Rebecca Yarros</p>
+                </div>
+              </div>
+              <span
+                class="absolute top-2 left-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1"
+              >
+                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                Best Seller
+              </span>
+            </div>
+            <div class="p-4">
+              <div class="flex items-center gap-1 mb-2">
+                <span class="text-accent text-sm">★★★★★</span>
+                <span class="text-muted text-xs">4.8</span>
+              </div>
+              <h4 class="font-semibold truncate">Iron Flame</h4>
+              <p class="text-muted text-sm">Rebecca Yarros</p>
+              <div class="flex items-center justify-between mt-3">
+                <span class="font-display text-lg font-semibold text-accent"
+                  >$28.99</span
+                >
+                <button
+                  class="btn-primary px-3 py-1.5 rounded-full text-bg text-xs font-semibold"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+          </article>
+
+          <article
+            class="carousel-item flex-shrink-0 w-64 bg-bg border border-border rounded-2xl overflow-hidden group"
+          >
+            <div class="relative">
+              <div
+                class="aspect-[3/4] bg-gradient-to-br from-purple-900 to-fuchsia-900 flex items-center justify-center"
+              >
+                <div class="text-center p-4">
+                  <h4 class="font-display text-lg text-white font-semibold">
+                    A Court of Thorns
+                  </h4>
+                  <p class="text-purple-200/60 mt-2 text-xs">Sarah J. Maas</p>
+                </div>
+              </div>
+              <span
+                class="absolute top-2 left-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1"
+              >
+                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                Best Seller
+              </span>
+            </div>
+            <div class="p-4">
+              <div class="flex items-center gap-1 mb-2">
+                <span class="text-accent text-sm">★★★★★</span>
+                <span class="text-muted text-xs">4.7</span>
+              </div>
+              <h4 class="font-semibold truncate">A Court of Thorns</h4>
+              <p class="text-muted text-sm">Sarah J. Maas</p>
+              <div class="flex items-center justify-between mt-3">
+                <span class="font-display text-lg font-semibold text-accent"
+                  >$18.99</span
+                >
+                <button
+                  class="btn-primary px-3 py-1.5 rounded-full text-bg text-xs font-semibold"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+          </article>
+
+          <article
+            class="carousel-item flex-shrink-0 w-64 bg-bg border border-border rounded-2xl overflow-hidden group"
+          >
+            <div class="relative">
+              <div
+                class="aspect-[3/4] bg-gradient-to-br from-teal-900 to-cyan-900 flex items-center justify-center"
+              >
+                <div class="text-center p-4">
+                  <h4 class="font-display text-lg text-white font-semibold">
+                    Lessons in Chemistry
+                  </h4>
+                  <p class="text-teal-200/60 mt-2 text-xs">Bonnie Garmus</p>
+                </div>
+              </div>
+              <span
+                class="absolute top-2 left-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1"
+              >
+                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                Best Seller
+              </span>
+            </div>
+            <div class="p-4">
+              <div class="flex items-center gap-1 mb-2">
+                <span class="text-accent text-sm">★★★★☆</span>
+                <span class="text-muted text-xs">4.6</span>
+              </div>
+              <h4 class="font-semibold truncate">Lessons in Chemistry</h4>
+              <p class="text-muted text-sm">Bonnie Garmus</p>
+              <div class="flex items-center justify-between mt-3">
+                <span class="font-display text-lg font-semibold text-accent"
+                  >$24.99</span
+                >
+                <button
+                  class="btn-primary px-3 py-1.5 rounded-full text-bg text-xs font-semibold"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+          </article>
+
+          <article
+            class="carousel-item flex-shrink-0 w-64 bg-bg border border-border rounded-2xl overflow-hidden group"
+          >
+            <div class="relative">
+              <div
+                class="aspect-[3/4] bg-gradient-to-br from-amber-900 to-yellow-900 flex items-center justify-center"
+              >
+                <div class="text-center p-4">
+                  <h4 class="font-display text-lg text-white font-semibold">
+                    Happy Place
+                  </h4>
+                  <p class="text-amber-200/60 mt-2 text-xs">Emily Henry</p>
+                </div>
+              </div>
+              <span
+                class="absolute top-2 left-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1"
+              >
+                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                Best Seller
+              </span>
+            </div>
+            <div class="p-4">
+              <div class="flex items-center gap-1 mb-2">
+                <span class="text-accent text-sm">★★★★★</span>
+                <span class="text-muted text-xs">4.8</span>
+              </div>
+              <h4 class="font-semibold truncate">Happy Place</h4>
+              <p class="text-muted text-sm">Emily Henry</p>
+              <div class="flex items-center justify-between mt-3">
+                <span class="font-display text-lg font-semibold text-accent"
+                  >$16.99</span
+                >
+                <button
+                  class="btn-primary px-3 py-1.5 rounded-full text-bg text-xs font-semibold"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+          </article>
+
+          <article
+            class="carousel-item flex-shrink-0 w-64 bg-bg border border-border rounded-2xl overflow-hidden group"
+          >
+            <div class="relative">
+              <div
+                class="aspect-[3/4] bg-gradient-to-br from-slate-800 to-zinc-900 flex items-center justify-center"
+              >
+                <div class="text-center p-4">
+                  <h4 class="font-display text-lg text-white font-semibold">
+                    The Housemaid
+                  </h4>
+                  <p class="text-slate-200/60 mt-2 text-xs">Freida McFadden</p>
+                </div>
+              </div>
+              <span
+                class="absolute top-2 left-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1"
+              >
+                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                Best Seller
+              </span>
+            </div>
+            <div class="p-4">
+              <div class="flex items-center gap-1 mb-2">
+                <span class="text-accent text-sm">★★★★☆</span>
+                <span class="text-muted text-xs">4.5</span>
+              </div>
+              <h4 class="font-semibold truncate">The Housemaid</h4>
+              <p class="text-muted text-sm">Freida McFadden</p>
+              <div class="flex items-center justify-between mt-3">
+                <span class="font-display text-lg font-semibold text-accent"
+                  >$14.99</span
+                >
+                <button
+                  class="btn-primary px-3 py-1.5 rounded-full text-bg text-xs font-semibold"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- New Arrivals -->
+    <section id="new-arrivals" class="py-20 lg:py-32 bg-bg relative">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+          <p
+            class="reveal text-accent font-medium tracking-widest uppercase text-sm mb-3"
+          >
+            Fresh Off the Press
+          </p>
+          <h2 class="reveal font-display text-4xl lg:text-5xl font-semibold">
+            New Arrivals
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <!-- New Arrival Cards with horizontal layout -->
+          <article
+            class="reveal book-card bg-card border border-border rounded-2xl p-4 flex gap-4 group"
+          >
+            <div
+              class="w-24 h-32 flex-shrink-0 rounded-lg overflow-hidden bg-gradient-to-br from-rose-800 to-pink-900 flex items-center justify-center"
+            >
+              <span class="font-display text-sm text-white text-center px-2"
+                >Tomorrow x3</span
+              >
+            </div>
+            <div class="flex-1 min-w-0">
+              <span
+                class="inline-block bg-emerald-500/20 text-emerald-400 text-xs font-semibold px-2 py-0.5 rounded mb-2"
+                >NEW</span
+              >
+              <h4 class="font-semibold truncate">Tomorrow, and Tomorrow</h4>
+              <p class="text-muted text-sm mb-2">Gabrielle Zevin</p>
+              <div class="flex items-center gap-1 mb-2">
+                <span class="text-accent text-xs">★★★★★</span>
+              </div>
+              <span class="font-display text-lg font-semibold text-accent"
+                >$28.99</span
+              >
+            </div>
+          </article>
+
+          <article
+            class="reveal book-card bg-card border border-border rounded-2xl p-4 flex gap-4 group"
+          >
+            <div
+              class="w-24 h-32 flex-shrink-0 rounded-lg overflow-hidden bg-gradient-to-br from-cyan-800 to-blue-900 flex items-center justify-center"
+            >
+              <span class="font-display text-sm text-white text-center px-2"
+                >Hello Beautiful</span
+              >
+            </div>
+            <div class="flex-1 min-w-0">
+              <span
+                class="inline-block bg-emerald-500/20 text-emerald-400 text-xs font-semibold px-2 py-0.5 rounded mb-2"
+                >NEW</span
+              >
+              <h4 class="font-semibold truncate">Hello Beautiful</h4>
+              <p class="text-muted text-sm mb-2">Ann Napolitano</p>
+              <div class="flex items-center gap-1 mb-2">
+                <span class="text-accent text-xs">★★★★☆</span>
+              </div>
+              <span class="font-display text-lg font-semibold text-accent"
+                >$24.99</span
+              >
+            </div>
+          </article>
+
+          <article
+            class="reveal book-card bg-card border border-border rounded-2xl p-4 flex gap-4 group"
+          >
+            <div
+              class="w-24 h-32 flex-shrink-0 rounded-lg overflow-hidden bg-gradient-to-br from-amber-800 to-orange-900 flex items-center justify-center"
+            >
+              <span class="font-display text-sm text-white text-center px-2"
+                >Yellowface</span
+              >
+            </div>
+            <div class="flex-1 min-w-0">
+              <span
+                class="inline-block bg-emerald-500/20 text-emerald-400 text-xs font-semibold px-2 py-0.5 rounded mb-2"
+                >NEW</span
+              >
+              <h4 class="font-semibold truncate">Yellowface</h4>
+              <p class="text-muted text-sm mb-2">R.F. Kuang</p>
+              <div class="flex items-center gap-1 mb-2">
+                <span class="text-accent text-xs">★★★★★</span>
+              </div>
+              <span class="font-display text-lg font-semibold text-accent"
+                >$19.99</span
+              >
+            </div>
+          </article>
+
+          <article
+            class="reveal book-card bg-card border border-border rounded-2xl p-4 flex gap-4 group"
+          >
+            <div
+              class="w-24 h-32 flex-shrink-0 rounded-lg overflow-hidden bg-gradient-to-br from-violet-800 to-purple-900 flex items-center justify-center"
+            >
+              <span class="font-display text-sm text-white text-center px-2"
+                >The Covenant</span
+              >
+            </div>
+            <div class="flex-1 min-w-0">
+              <span
+                class="inline-block bg-emerald-500/20 text-emerald-400 text-xs font-semibold px-2 py-0.5 rounded mb-2"
+                >NEW</span
+              >
+              <h4 class="font-semibold truncate">The Covenant of Water</h4>
+              <p class="text-muted text-sm mb-2">Abraham Verghese</p>
+              <div class="flex items-center gap-1 mb-2">
+                <span class="text-accent text-xs">★★★★★</span>
+              </div>
+              <span class="font-display text-lg font-semibold text-accent"
+                >$32.99</span
+              >
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section
+      id="about"
+      class="py-20 lg:py-32 bg-gradient-to-b from-card to-bg relative"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+          <p
+            class="reveal text-accent font-medium tracking-widest uppercase text-sm mb-3"
+          >
+            Reader Reviews
+          </p>
+          <h2 class="reveal font-display text-4xl lg:text-5xl font-semibold">
+            What Our Readers Say
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <article class="reveal bg-card border border-border rounded-2xl p-8">
+            <div class="flex items-center gap-1 mb-4">
+              <span class="text-accent">★★★★★</span>
+            </div>
+            <p class="text-warmGray/80 mb-6 leading-relaxed">
+              "Folio has become my go-to for discovering new authors. The
+              curated collections are exceptional, and the delivery is always
+              prompt. I've found so many books I never would have picked up
+              otherwise."
+            </p>
+            <div class="flex items-center gap-4">
+              <div
+                class="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-amber-600 flex items-center justify-center text-bg font-semibold"
+              >
+                ER
+              </div>
+              <div>
+                <p class="font-semibold">Elena Rodriguez</p>
+                <p class="text-muted text-sm">Avid Reader</p>
+              </div>
+            </div>
+          </article>
+
+          <article class="reveal bg-card border border-border rounded-2xl p-8">
+            <div class="flex items-center gap-1 mb-4">
+              <span class="text-accent">★★★★★</span>
+            </div>
+            <p class="text-warmGray/80 mb-6 leading-relaxed">
+              "The recommendations are spot-on. It feels like the team actually
+              reads and cares about the books they feature. My library has grown
+              beautifully since I started ordering here."
+            </p>
+            <div class="flex items-center gap-4">
+              <div
+                class="w-12 h-12 rounded-full bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center text-white font-semibold"
+              >
+                MK
+              </div>
+              <div>
+                <p class="font-semibold">Marcus Kim</p>
+                <p class="text-muted text-sm">Book Collector</p>
+              </div>
+            </div>
+          </article>
+
+          <article class="reveal bg-card border border-border rounded-2xl p-8">
+            <div class="flex items-center gap-1 mb-4">
+              <span class="text-accent">★★★★★</span>
+            </div>
+            <p class="text-warmGray/80 mb-6 leading-relaxed">
+              "Finally, a bookstore that treats books as art. The packaging is
+              beautiful, the selection is thoughtful, and the prices are fair. I
+              recommend Folio to every reader I know."
+            </p>
+            <div class="flex items-center gap-4">
+              <div
+                class="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-semibold"
+              >
+                SP
+              </div>
+              <div>
+                <p class="font-semibold">Sarah Patel</p>
+                <p class="text-muted text-sm">Literary Blogger</p>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Newsletter -->
+    <section class="py-20 lg:py-32 bg-bg relative overflow-hidden">
+      <div class="gradient-blob bg-accent/30 -right-40 top-0"></div>
+      <div class="gradient-blob bg-amber-600/20 -left-40 bottom-0"></div>
+
+      <div
+        class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center"
+      >
+        <h2 class="reveal font-display text-4xl lg:text-5xl font-semibold mb-4">
+          Stay in the Loop
+        </h2>
+        <p class="reveal text-warmGray/70 text-lg mb-8">
+          Subscribe for curated book recommendations, exclusive deals, and early
+          access to new arrivals.
+        </p>
+
+        <form class="reveal flex flex-col sm:flex-row gap-4 max-w-xl mx-auto">
+          <input
+            type="email"
+            placeholder="Enter your email"
+            class="flex-1 bg-card border border-border rounded-full px-6 py-4 text-fg placeholder:text-muted focus:outline-none focus:border-accent transition-colors"
+            required
+          />
+          <button
+            type="submit"
+            class="btn-primary px-8 py-4 rounded-full text-bg font-semibold whitespace-nowrap"
+          >
+            Subscribe for Updates
+          </button>
+        </form>
+
+        <p class="reveal text-muted text-sm mt-4">
+          Join 50,000+ book lovers. Unsubscribe anytime.
+        </p>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-card border-t border-border py-16">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12">
+          <!-- Brand -->
+          <div class="col-span-2 lg:col-span-1">
+            <a href="#" class="flex items-center gap-2 mb-4">
+              <svg
+                class="w-8 h-8 text-accent"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="1.5"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"
+                />
+              </svg>
+              <span class="font-display text-2xl font-semibold">Folio</span>
+            </a>
+            <p class="text-muted text-sm mb-4">
+              Curating stories that matter since 2015. Your trusted source for
+              literary excellence.
+            </p>
+            <div class="flex gap-4">
+              <a
+                href="#"
+                class="w-10 h-10 rounded-full bg-bg border border-border flex items-center justify-center text-muted hover:text-accent hover:border-accent transition-colors"
+                aria-label="Twitter"
+              >
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path
+                    d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
+                  />
+                </svg>
+              </a>
+              <a
+                href="#"
+                class="w-10 h-10 rounded-full bg-bg border border-border flex items-center justify-center text-muted hover:text-accent hover:border-accent transition-colors"
+                aria-label="Instagram"
+              >
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path
+                    d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.375.058 4.121.058h.08c2.447 0 2.768-.01 3.82-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.67-.01-2.986-.058-4.04-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z"
+                  />
+                </svg>
+              </a>
+              <a
+                href="#"
+                class="w-10 h-10 rounded-full bg-bg border border-border flex items-center justify-center text-muted hover:text-accent hover:border-accent transition-colors"
+                aria-label="Facebook"
+              >
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path
+                    d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
+                  />
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Links -->
+          <div>
+            <h4 class="font-semibold mb-4">Shop</h4>
+            <ul class="space-y-2 text-sm text-muted">
+              <li>
+                <a href="#" class="hover:text-accent transition-colors"
+                  >New Arrivals</a
+                >
+              </li>
+              <li>
+                <a href="#" class="hover:text-accent transition-colors"
+                  >Best Sellers</a
+                >
+              </li>
+              <li>
+                <a href="#" class="hover:text-accent transition-colors">Sale</a>
+              </li>
+              <li>
+                <a href="#" class="hover:text-accent transition-colors"
+                  >Gift Cards</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="font-semibold mb-4">Categories</h4>
+            <ul class="space-y-2 text-sm text-muted">
+              <li>
+                <a href="#" class="hover:text-accent transition-colors"
+                  >Fiction</a
+                >
+              </li>
+              <li>
+                <a href="#" class="hover:text-accent transition-colors"
+                  >Non-Fiction</a
+                >
+              </li>
+              <li>
+                <a href="#" class="hover:text-accent transition-colors"
+                  >Children's</a
+                >
+              </li>
+              <li>
+                <a href="#" class="hover:text-accent transition-colors"
+                  >Audiobooks</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="font-semibold mb-4">Support</h4>
+            <ul class="space-y-2 text-sm text-muted">
+              <li>
+                <a href="#" class="hover:text-accent transition-colors"
+                  >Contact Us</a
+                >
+              </li>
+              <li>
+                <a href="#" class="hover:text-accent transition-colors">FAQ</a>
+              </li>
+              <li>
+                <a href="#" class="hover:text-accent transition-colors"
+                  >Shipping</a
+                >
+              </li>
+              <li>
+                <a href="#" class="hover:text-accent transition-colors"
+                  >Returns</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="font-semibold mb-4">Company</h4>
+            <ul class="space-y-2 text-sm text-muted">
+              <li>
+                <a href="#" class="hover:text-accent transition-colors"
+                  >About Us</a
+                >
+              </li>
+              <li>
+                <a href="#" class="hover:text-accent transition-colors"
+                  >Careers</a
+                >
+              </li>
+              <li>
+                <a href="#" class="hover:text-accent transition-colors"
+                  >Press</a
+                >
+              </li>
+              <li>
+                <a href="#" class="hover:text-accent transition-colors">Blog</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div
+          class="pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4"
+        >
+          <p class="text-muted text-sm">
+            2025 Folio Books. All rights reserved.
+          </p>
+          <div class="flex gap-6 text-sm text-muted">
+            <a href="#" class="hover:text-accent transition-colors"
+              >Privacy Policy</a
+            >
+            <a href="#" class="hover:text-accent transition-colors"
+              >Terms of Service</a
+            >
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Initialize all variables before use
+      const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+      const closeMenuBtn = document.getElementById("close-menu");
+      const mobileMenu = document.getElementById("mobile-menu");
+      const carousel = document.getElementById("bestsellers-carousel");
+      const prevBtn = document.getElementById("prev-bestseller");
+      const nextBtn = document.getElementById("next-bestseller");
+
+      // Mobile menu toggle
+      if (mobileMenuBtn && mobileMenu && closeMenuBtn) {
+        mobileMenuBtn.addEventListener("click", () => {
+          mobileMenu.classList.add("open");
+        });
+
+        closeMenuBtn.addEventListener("click", () => {
+          mobileMenu.classList.remove("open");
+        });
+
+        // Close menu on link click
+        mobileMenu.querySelectorAll("a").forEach((link) => {
+          link.addEventListener("click", () => {
+            mobileMenu.classList.remove("open");
+          });
+        });
+      }
+
+      // Carousel scroll
+      if (carousel && prevBtn && nextBtn) {
+        const scrollAmount = 280;
+
+        prevBtn.addEventListener("click", () => {
+          carousel.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+        });
+
+        nextBtn.addEventListener("click", () => {
+          carousel.scrollBy({ left: scrollAmount, behavior: "smooth" });
+        });
+      }
+
+      // Scroll reveal animation
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: "0px 0px -50px 0px",
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("active");
+          }
+        });
+      }, observerOptions);
+
+      // Observe all reveal elements
+      document.querySelectorAll(".reveal, .reveal-left").forEach((el) => {
+        observer.observe(el);
+      });
+
+      // Navbar background on scroll
+      const navbar = document.querySelector("nav");
+      if (navbar) {
+        let lastScroll = 0;
+
+        window.addEventListener("scroll", () => {
+          const currentScroll = window.pageYOffset;
+
+          if (currentScroll > 100) {
+            navbar.style.backgroundColor = "rgba(15, 15, 15, 0.98)";
+          } else {
+            navbar.style.backgroundColor = "rgba(15, 15, 15, 0.95)";
+          }
+
+          lastScroll = currentScroll;
+        });
+      }
+
+      // Newsletter form
+      const newsletterForm = document.querySelector("form");
+      if (newsletterForm) {
+        newsletterForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const input = newsletterForm.querySelector('input[type="email"]');
+          if (input && input.value) {
+            alert("Thanks for subscribing! Check your inbox for confirmation.");
+            input.value = "";
+          }
+        });
+      }
+    </script>
+  </body>
+</html>
